@@ -1,0 +1,205 @@
+void strCpy(char* destiny, char* source, int lim)
+{
+    if(*source == '\0')
+    {
+        *destiny = *source;
+        return;
+    }
+    if(lim == 0)
+    {
+        *destiny = '\0';
+        return;
+    }
+
+    *destiny = *source;
+    strCpy(destiny+1, source+1, --lim);
+}
+
+int getMostReps(char* string, int* index, int op)
+{
+    int reps = 1;
+    char c;
+    int mostReps = 0;
+    int aux = 0;
+    int first = 1;
+
+    if(string == NULL)
+    {
+        *index = -1;
+        return -1;
+    }
+    
+    if(op == 0)
+    {
+        for(int i = 0, j = i + 1; j < strlen(string); i++, j++)
+        {
+            if(string[i] == string[j])
+            {
+                c = string[i];
+                reps++;
+                
+                if(mostReps < reps)
+                {
+                    aux++;
+                    mostReps = reps;
+                     *index = j - aux;
+                }
+            }
+           
+            else
+            {
+                reps = 1;
+            }
+
+            if(mostReps == 0)
+            {
+                mostReps = reps;
+                *index = i;
+            }
+        }
+    }
+
+    else
+    {
+        for(int i = strlen(string), j = i - 1; j > 0; i--, j--)
+        {
+            if(string[i] == string[j])
+            {
+                c = string[i];
+                reps++;
+                
+                if(mostReps < reps)
+                {
+                    aux++;
+                    mostReps = reps;
+                     *index = j;
+                }
+            }
+           
+            else
+            {
+                reps = 1;
+            }
+
+            if(mostReps == 0)
+            {
+                mostReps = reps;
+                *index = j;
+            }
+        }
+    }
+
+    return mostReps;
+}
+
+char* assembly(char* string)
+{
+    if(string == NULL)
+    {
+        return NULL;
+    }
+
+    int index = 0;
+
+    int size0 = getMostReps(string, &index, 0);
+
+    char* newString1 = (char*)malloc(index*sizeof(char)+1);
+    if(newString1 == NULL)
+    {
+        printf("Falta memoria\n");
+        exit(1);
+    }
+
+    strCpy(newString1, string, index);
+
+    char* newString2 = (char*)malloc((strlen(string) - (index+size0))*sizeof(char)+1);
+    if(newString2 == NULL)
+    {
+        printf("Falta memoria\n");
+        exit(1);
+    }
+
+    for(int i = index + size0, j = 0; i < strlen(string); i++, j++)
+    {
+        newString2[j] = string[i];
+    }
+
+    int size1 = getMostReps(string, &index, 1);
+
+    char* newString3 = (char*)malloc(index*sizeof(char)+1);
+    if(newString3 == NULL)
+    {
+        printf("Falta memoria\n");
+        exit(1);
+    }
+
+    strCpy(newString3, string, index);
+
+    char* newString4 = (char*)malloc((strlen(string) - (index+size0))*sizeof(char)+1);
+    if(newString4 == NULL)
+    {
+        printf("Falta memoria\n");
+        exit(1);
+    }
+
+    for(int i = index + size0, j = 0; i < strlen(string); i++, j++)
+    {
+        newString4[j] = string[i];
+    }
+
+    int len1 = strlen(newString1);
+    int len2 = strlen(newString2);
+    int len3 = strlen(newString3);
+    int len4 = strlen(newString4);
+    int lenTotal = len1 + len2 + len3 + len4;
+
+    char* newString = (char*)malloc(lenTotal*sizeof(char)+1);
+    if(newString == NULL)
+    {
+        printf("Falta de memoria\n");
+        exit(1);
+    }
+    int w = 0;
+    for(int i = 0; i < len2; i++)
+    {
+        newString[w] = newString2[i];
+        w++;
+    }
+    for(int i = 0; i < len1; i++)
+    {
+        newString[w] = newString1[i];
+        w++;
+    }
+    for(int i = 0; i < len4; i++)
+    {
+        newString[w] = newString4[i];
+        w++;
+    }
+    for(int i = 0; i < len3; i++)
+    {
+        newString[w] = newString3[i];
+        w++;
+    }
+    newString[w] = '\0';
+
+    free(newString1);
+    free(newString2);
+    free(newString3);
+    free(newString4);
+    return newString;
+}
+
+int main(void){
+   
+    int index = 0;
+
+    //unico caso nao funcionando Ã© o do ppppp
+    char* string = "aabbbcdddebbfffg";
+
+    string = assembly(string);
+    printf("%s\n", string);
+
+    free(string);
+
+    return 0;
+}

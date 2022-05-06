@@ -1,0 +1,21 @@
+Digite a quantidade de inteiros em cada conjunto: 6
+Conjunto 1
+Digite um valor inteiro: 65
+Digite um valor inteiro: 70
+Digite um valor inteiro: 21
+Digite um valor inteiro: 6
+Digite um valor inteiro: 89
+Digite um valor inteiro: 7
+        Valores adjacentes com maior diferenca absoluta: 6 89
+Conjunto 2
+Digite um valor inteiro: 5
+Digite um valor inteiro: 120
+Valores adjacentes com maior diferenca absoluta: 5 120
+Conjunto 3
+Digite um valor inteiro: 69
+Digite um valor inteiro: 7
+Digite um valor inteiro: 46
+Digite um valor inteiro: 1
+Digite um valor inteiro: 101
+Digite um valor inteiro: 0
+Valores adjacentes com maior diferenca absoluta: 101 0

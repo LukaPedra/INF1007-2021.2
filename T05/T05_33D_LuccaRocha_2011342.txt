@@ -1,0 +1,23 @@
+Digite o numero do devedor: 56
+Digite o valor da dívida: 150
+NAO PODE PARCELAR
+
+Digite o numero do devedor: 96
+Digite o valor da dívida: 4563
+
+Codigo: 96       Divida: R$4563.00 
+Numero de parcelas: 45   Valor da parcela: 101.40
+
+Digite o numero do devedor: 67
+Digite o valor da dívida: 68452
+
+Codigo: 67       Divida: R$68452.00 
+Numero de parcelas: 60   Valor da parcela: 1140.87
+
+Digite o numero do devedor: 45
+Digite o valor da dívida: 150000
+NAO PODE PARCELAR
+
+Digite o numero do devedor: 0
+
+Total de devedores: 4   Puderam parcelar divida: 2

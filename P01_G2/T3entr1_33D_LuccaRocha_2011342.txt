@@ -1,0 +1,7 @@
+1010 50.25 20 Tanacetum parthenium
+1015 5.00 10 Salix alba
+1050 90.00 50 Tribulus terrestris
+2020 100.00 40 Passiflora incarnata
+2050 15.00 30 Ginkgo biloba
+2057 100.00 80 Petasites hybridus
+3000 50.00 10 Hypericum perforatum

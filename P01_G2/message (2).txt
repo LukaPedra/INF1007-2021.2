@@ -1,0 +1,225 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SALES_FILE "vendas.txt"
+#define LIST_FILE "estoque.txt"
+#define STOCK_FILE "estoque.dat"
+
+typedef struct product {
+	int code;
+	float price;
+	int quantity;
+	char name[87];
+} Product;
+
+void build_stock();
+int read_stock(Product *products);
+int process_sales(Product *products, int product_num);
+Product *search_product(Product *products, int product_num, int code);
+void show_promo_product(Product *products, int product_num);
+void print_stock();
+void sell();
+
+int main(void)
+{
+	unsigned int op;
+
+	do {
+		printf( "1 - Montar estoque\n"
+				"2 - Imprimir estoque\n"
+				"3 - Vender\n"
+				"4 - Sair\n");
+
+		scanf(" %d", &op);
+
+		switch (op) {
+		case 1:
+			build_stock();
+			break;
+		case 2:
+			print_stock();
+			break;
+		case 3:
+			sell();
+			break;
+		case 4:
+			break;
+		default:
+			fprintf(stderr, "Erro: comando não reconhecido.\n");
+			break;
+		}
+
+	} while (op != 4);
+
+	return 0;
+}
+
+void build_stock()
+{
+	Product products[9000];
+	int product_num = 0;
+	FILE *handle = fopen(LIST_FILE, "rb");
+	if (!handle) {
+		fprintf(stderr, "Falha ao abrir o arquivo \"%s\"\n", LIST_FILE);
+		exit(EXIT_FAILURE);
+	}
+
+	while (fscanf(handle, " %d %f %d %86[^\n]", &products[product_num].code, &products[product_num].price, &products[product_num].quantity, products[product_num].name) > 0) {
+		++product_num;
+	}
+
+	fclose(handle);
+
+	handle = fopen(STOCK_FILE, "wb");
+	fwrite(products, sizeof(Product), product_num, handle);
+	fclose(handle);
+
+	printf("Foram lidos %d produtos.\n", product_num);
+
+}
+
+void print_stock()
+{
+	Product products[9000];
+	int i, product_num = read_stock(products);
+
+	if (product_num == -1)
+		exit(EXIT_FAILURE);
+
+	for (i = 0; i < product_num; ++i) {
+		printf("código = %d\tpreço = %.2f\tqtd = %d\tnome = %s\n",
+					products[i].code, products[i].price,
+					products[i].quantity, products[i].name);
+	}
+
+}
+
+void sell() {
+	Product products[9000];
+	int i, product_num;
+
+	product_num = read_stock(products);
+	if (product_num == -1)
+		return;
+
+	if (process_sales(products, product_num) == -1)
+		return;
+
+	show_promo_product(products, product_num);
+
+	for (i = 0; i < product_num; ++i) {
+		printf("código = %d\tpreço = %.2f\tqtd = %d\tnome = %s\n",
+					products[i].code, products[i].price,
+					products[i].quantity, products[i].name);
+	}
+}
+
+int process_sales(Product *products, int product_num)
+{
+	int code, quantity;
+	FILE *handle = fopen(SALES_FILE, "r");
+	if (!handle) {
+		fprintf (stderr, "Erro ao abrir o arquivo \"%s\"\n", SALES_FILE);
+		return -1;
+	}
+
+	while (fscanf(handle, " %d %d", &code, &quantity) > 0) {
+		Product *product = search_product(products, product_num, code);
+		if (!product)
+			continue;
+
+		product->quantity -= quantity;
+		if (product->quantity < 0)
+			product->quantity = 0;
+	}
+
+	fclose(handle);
+
+	return 0;
+}
+
+int read_stock(Product *products)
+{
+	int lines = 0;
+	FILE *handle = fopen(STOCK_FILE, "rb");
+	if (!handle) {
+		fprintf(stderr, "Falha ao abrir o arquivo \"%s\"\n", STOCK_FILE);
+		return -1;
+	}
+
+	while (fread(&products[lines], sizeof(Product), 1, handle) == 1) {
+		++lines;
+	}
+
+	fclose(handle);
+
+	return lines;
+}
+
+Product *bin_search_product(Product *products, int min, int max, int code)
+{
+	int mid;
+
+	if (max >= min)
+		return NULL;
+
+	mid = min + (max - 1)/2;
+
+	if (products[mid].code == code)
+		return &products[mid];
+	else if (products[mid].code > code)
+		return bin_search_product(products, min, mid-1, code);
+	else
+		return bin_search_product(products, mid+1, max, code);
+
+}
+
+Product *search_product(Product *products, int product_num, int code)
+{
+	return bin_search_product(products, 0, product_num, code);
+}
+
+void show_promo_product(Product *products, int product_num)
+{
+	Product *product = NULL;
+	int i;
+	int max_stock, max_price, smallest_code;
+
+	if (products == NULL || product_num == 0) {
+		puts("Nenhum remédio foi escolhido para promoção.");
+		return;
+	}
+
+	product = products;
+	max_stock = product->quantity;
+	max_price = product->price;
+	smallest_code = product->code;
+
+	for (i = 1; i < product_num; ++i) {
+		if (products[i].quantity < max_stock)
+			continue;
+
+		if (products[i].quantity == max_stock) {
+			if (products[i].price < max_price)
+				continue;
+			else if (products[i].price == max_price) {
+				if (products[i].code > smallest_code)
+					continue;
+			}
+		}
+
+		product = (products + i);
+		max_stock = product->quantity;
+		max_price = product->price;
+		smallest_code = product->code;
+	}
+
+	printf( "O remédio selecionado para promoção foi:\n"
+			"\tCódigo:                %d\n"
+			"\tPreço:                 R$ %.2f\n"
+			"\tQuantidade em estoque: %d\n"
+			"\tNome:                  %s\n\n",
+			product->code, product->price, product->quantity, product->name);
+
+}
+
